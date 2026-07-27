@@ -5,7 +5,7 @@
 #import "/Theme/generic_cover.typ": cover-page
 
 #cover-page(title: [Training '26], subtitle: [Electrical | Phase 1], topic: "Phase 1 Timeline")
-#show: report-template.with(frame-title: "Phase I - Electrical")
+#show: report-template.with(ribbon-text: "Phase I - Electrical")
 
 Welcome to the #emphasis("AUR") training for the 2026-2027 season. You may find below the planned timeline for #emphasis("Phase 1") of the training for the electrical tracks -- #emphasis("Software") & #emphasis("Hardware").
 

@@ -15,3 +15,7 @@ winget install --id Typst.Typst
 https://repology.org/project/typst/versions
 
 > Open the repository's root in VSCode and install the recommended extensions
+
+> Install Nasalization font
+
+https://www.dafont.com/nasalization.font

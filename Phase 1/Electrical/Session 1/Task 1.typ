@@ -7,12 +7,12 @@
 #import "@preview/calloutly:1.1.0": important, tip
 
 #cover-page(title: [Training '26], subtitle: [Electrical | Phase I], topic: "Task 1: Electronics & Simulation")
-// #show: report-template.with(frame-title: "Task 1", foreground_watermark: watermark_text(
+// #show: report-template.with(ribbon-text: "Task 1", foreground_watermark: watermark_text(
 //   content: "INTERNAL USE ONLY",
 //   gaps: 1.25pt,
 //   opacity: 40%,
 // ))
-#show: report-template.with(frame-title: "Task 1")
+#show: report-template.with(ribbon-text: "Task 1")
 
 = Introduction
 

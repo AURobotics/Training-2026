@@ -14,6 +14,7 @@
 
 #let show-page-number = state("show-page-number", true)
 #let last-counted-page = state("last-counted-page", 1)
+#let current-ribbon-text = state("ribbon-text", none)
 
 #let pause-page-counting() = {
   context {
@@ -55,11 +56,13 @@
 }
 
 /// A branded report template with a header ribbon.
-/// - frame-title (str|content): The text or block to display in the header ribbon.
+/// - ribbon-text (str|content): The text or block to display in the header ribbon.
 /// - frame-skip-pages (array): A list of page numbers where the header should not appear.
-#let report-template(frame-title: "Technical Report", foreground_watermark: none, background_watermark: none, frame-skip-pages: (), margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm), justify: true, body) = {
-  assert(type(frame-title) in (str, content), message: "frame-title must be a string or content")
+#let report-template(ribbon-text: "Technical Report", foreground_watermark: none, background_watermark: none, frame-skip-pages: (), margin: (top: 2.5cm, bottom: 2.5cm, left: 2.5cm, right: 2.5cm), justify: true, body) = {
+  assert(type(ribbon-text) in (str, content), message: "ribbon-text must be a string or content")
   assert(type(frame-skip-pages) == array, message: "frame-skip-pages must be an array of integers")
+  
+  current-ribbon-text.update(ribbon-text)
   
   show: callout-style.with(style: "quarto")
   set par(justify: justify)
@@ -92,7 +95,7 @@
         
         let final-title = align(horizon)[
           #set text(..header-style)
-          #frame-title
+          #current-ribbon-text.get()
         ]
         
         let title-block = block(

@@ -3,7 +3,7 @@
 #import "/Theme/generic_cover.typ": cover-page
 
 #cover-page(title: [Training '26], subtitle: [Electrical | Phase 1], topic: "Phase 1 Timeline")
-#show: report-template.with(frame-title: "Phase I - Electrical", foreground_watermark: watermark_text(content: "INTERNAL USE ONLY", gaps: 1.1pt, opacity: 50))
+#show: report-template.with(ribbon-text: "Phase I - Electrical", foreground_watermark: watermark_text(content: "INTERNAL USE ONLY", gaps: 1.1pt, opacity: 50))
 
 You may find below the planned timeline for #emphasis("Phase 1") of the training for the electrical tracks -- #emphasis("Software") & #emphasis("Hardware").
 
