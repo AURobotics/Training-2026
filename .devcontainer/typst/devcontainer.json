@@ -1,0 +1,13 @@
+{
+    "name": "Typst",
+    "image": "ghcr.io/typst/typst:latest",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "myriad-dreamin.tinymist"
+            ]
+        }
+    }
+}

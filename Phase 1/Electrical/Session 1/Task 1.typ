@@ -1,8 +1,6 @@
 #import "/Theme/report.typ": (
-  brand-palette, emphasis, watermark_text, pause-page-counting, report-template, resume-page-counting,
+  brand-palette, emphasis, watermark_text, pause-page-counting, report-template, resume-page-counting, cover-page
 )
-
-#import "/Theme/generic_cover.typ": cover-page
 
 #import "@preview/calloutly:1.1.0": important, tip
 

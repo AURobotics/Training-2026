@@ -1,6 +1,4 @@
-#import "/Theme/report.typ": brand-palette, emphasis, pause-page-counting, report-template, resume-page-counting
-
-#import "/Theme/generic_cover.typ": cover-page
+#import "/Theme/report.typ": brand-palette, emphasis, pause-page-counting, report-template, resume-page-counting, cover-page
 
 #cover-page(title: [Training '26], subtitle: [Mechanical | Phase I], topic: "Phase I Timeline")
 #show: report-template.with(ribbon-text: "Phase I - Mechanical")

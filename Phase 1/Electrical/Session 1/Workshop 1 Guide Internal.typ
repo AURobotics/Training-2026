@@ -1,5 +1,5 @@
 #import "/Theme/report.typ": (
-  brand-palette, cover-page, emphasis, pause-page-counting, report-template, resume-page-counting, watermark_text,
+  brand-palette, emphasis, pause-page-counting, report-template, resume-page-counting, watermark_text, cover-page
 )
 
 #import "@preview/calloutly:1.1.0": important, tip
@@ -7,9 +7,14 @@
 #cover-page(
   title: [Training '26],
   subtitle: [Electrical | Phase I],
-  topic: [Workshop 1: Electronics & Simulation\ GUIDE],
+  topic: [Workshop 1: Electronics & Simulation\ MENTOR'S GUIDE],
 )
-#show: report-template.with(ribbon-text: "Workshop 1 | GUIDE")
+#show: report-template.with(ribbon-text: "Workshop 1 | GUIDE", foreground_watermark: watermark_text(
+  content: "INTERNAL USE ONLY",
+  gaps: 1.25pt,
+  size: 110pt,
+  opacity: 30%,
+))
 
 = Introduction
 
@@ -22,6 +27,7 @@ This workshop focuses on implementing circuits with the following interactive co
 
 The objective is to gain a fundamental basis in circuit analysis and DC electronic components.
 
+You should familiarize yourself with this guide to be able to properly explain and aid trainees in the workshop.
 = Requirements
 
 == Logic Gates by Wiring Push Buttons

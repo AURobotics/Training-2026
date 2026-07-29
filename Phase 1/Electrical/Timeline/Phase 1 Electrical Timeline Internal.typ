@@ -1,6 +1,4 @@
-#import "/Theme/report.typ": pause-page-counting, report-template, resume-page-counting, watermark_text, brand-palette, emphasis
-
-#import "/Theme/generic_cover.typ": cover-page
+#import "/Theme/report.typ": pause-page-counting, report-template, resume-page-counting, watermark_text, brand-palette, emphasis, cover-page
 
 #cover-page(title: [Training '26], subtitle: [Electrical | Phase 1], topic: "Phase 1 Timeline")
 #show: report-template.with(ribbon-text: "Phase I - Electrical", foreground_watermark: watermark_text(content: "INTERNAL USE ONLY", gaps: 1.1pt, opacity: 50))
