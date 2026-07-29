@@ -3,12 +3,10 @@
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/",
-    "updateContentCommand": "apt-get update && apt-get install -y curl git cargo && cargo install --locked typst-cli",
     "customizations": {
         "vscode": {
             "extensions": [
-                "myriad-dreamin.tinymist",
-                "GitHub.codespaces"
+                "myriad-dreamin.tinymist"
             ]
         }
     }
