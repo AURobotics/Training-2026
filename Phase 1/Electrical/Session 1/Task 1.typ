@@ -2,7 +2,7 @@
   brand-palette, emphasis, watermark_text, pause-page-counting, report-template, resume-page-counting, cover-page
 )
 
-#import "@preview/calloutly:1.1.0": important, tip
+#import "@preview/calloutly:1.1.0": important, tip, note
 
 #cover-page(title: [Training '26], subtitle: [Electrical | Phase I], topic: "Task 1: Electronics & Simulation")
 // #show: report-template.with(ribbon-text: "Task 1", foreground_watermark: watermark_text(
@@ -23,10 +23,12 @@ You are required to solve the problems by creating a #emphasis[Circuit] #box(ima
 == Logic Gates with Transistors
 Implement the AND gate and OR gate using transistors. Use push buttons as inputs to test the gates.
 
+_For simulation purposes, you may use DIP switches instead of push buttons._
+
 == Automatic Night Light
 Design and implement an automatic night light using an LDR and an NPN transistor.
 
-=== Requirements
+*Requirements*
 
 The LED should remain OFF in bright light.
 The LED should turn ON automatically in the dark.
@@ -40,6 +42,19 @@ Design and implement a blinking LED circuit using any method of your choice.
 == Temperature Alarm Circuit
 A factory owner wants to monitor the temperature of a component. Implement a circuit using a PTC thermistor
 and a transistor to trigger an alarm (buzzer or similar) when the temperature exceeds a certain threshold.
+
+#note[
+There is no actual component called PTC thermistor in Tinkercad.
+
+For reference: a PTC thermistor's resistance *increases* as temperature *increases*. We want the buzzer to beep when temperature *increases*.
+
+You have three options:
+
++ Use a `Potentiometer` to directly alter resistance. You should make the alarm beep when resistance is high.\ Reference: https://www.build-electronic-circuits.com/potentiometer/
+
++ Use Temperature Sensor `TMP36`: its voltage drop or "resistance" decreases as the reading increases. You should make the alarm turn *on* when the sensor value is *low* --- i.e when the sensor resistance is *high*.
+
++ If you prefer to, you can use something other than Tinkercad to submit the task.]
 
 = Submission
 

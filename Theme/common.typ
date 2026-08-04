@@ -9,3 +9,12 @@
   gray: rgb("#585858"),
   black: rgb("#181818"),
 )
+
+#import "@preview/codly:1.3.0": *
+#import "@preview/codly-languages:0.1.10": codly-languages
+
+#let setup-codly(body) = {
+  show: codly-init.with()
+  codly(languages: codly-languages)
+  body
+}

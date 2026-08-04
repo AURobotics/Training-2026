@@ -1,6 +1,7 @@
 #import "@preview/calloutly:1.1.0": callout-style
 #import "@preview/nth:1.0.1": *
 #import "/Theme/common.typ": brand-palette
+#import "@preview/headcount:0.1.1": dependent-numbering, reset-counter
 
 #let show-page-number = state("show-page-number", true)
 #let last-counted-page = state("last-counted-page", 1)
@@ -24,19 +25,21 @@
   let val = calc.min(int(float(opacity) * 255), 255)
   let opacity = str(val, base: 16)
   if opacity.len() == 1 { opacity = "0" + opacity }
-  return align(alignment)[
-    #rotate(rotation)[
-      #text(
-        fill: tiling(
-          size: (gaps + 1pt, gaps + 1pt),
-          relative: "parent",
-          align(alignment)[
-            #circle(radius: 1pt, fill: rgb("000000" + opacity))
-          ],
-        ),
-        size: size,
-        weight: "bold",
-      )[#content]
+  return pdf.artifact(kind: "watermark")[
+    #align(alignment)[
+      #rotate(rotation)[
+        #text(
+          fill: tiling(
+            size: (gaps + 1pt, gaps + 1pt),
+            relative: "parent",
+            align(alignment)[
+              #circle(radius: 1pt, fill: rgb("000000" + opacity))
+            ],
+          ),
+          size: size,
+          weight: "bold",
+        )[#content]
+      ]
     ]
   ]
 }
@@ -224,6 +227,7 @@
       numbering("1.1", ..nums.pos().slice(1))
     }
   })
+  show heading: reset-counter(counter(heading), levels: 1)
   show link: set text(fill: brand-palette.primary)
   show outline.entry: set text(fill: brand-palette.primary)
   show outline.entry: it => {
