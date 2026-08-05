@@ -17,79 +17,123 @@
 = Introduction
 
 This workshop focuses on configuring multi-controller architectures and implementing communication protocols between microcontrollers -- specifically Arduino development boards -- covering:
-- Inter-board *UART Serial Communication* (Master-Slave Link).
-- Synchronous *I2C Interface* for external displays.
-- Data forwarding and real-time text rendering.
+- Inter-board *Software Serial UART Communication* (Master-Slave Link).
+- Synchronous *I2C Interface* for sensor data and actuators.
+- Data command parsing and real-time output control.
 - Common ground references and hardware serial synchronization.
 
-The objective is to gain practical experience in transferring data streams across two microcontrollers and rendering the received information on an I2C display.
+The objective is to gain practical experience in transferring data streams across microcontrollers using hardware and software interfaces.
 
 = Requirements
 
-The workshop features a multi-node communication system subdivided into two core milestones. The main objective is to design and assemble a #emphasis[Master-Slave Serial Bridge with I2C Display] circuit.
+The workshop consists of two distinct multi-node communication tasks. You will design and implement a #emphasis[Software Serial Command Link] and an #emphasis[I2C Master-Slave Telemetry Link].
 
-The following components will be provided to you in *Tinkercad Circuits*:
+The following components will be provided to you in *Tinkercad Circuits* / *Hardware*:
 - 2#sym.times Microcontroller Boards (Arduino Uno)
-- 1#sym.times I2C LCD Display (16x2 with PCF8574 Adapter)
-- Breadboard & Virtual Jumper Wires
+- 3#sym.times LEDs (Red, Green, Blue) or 1#sym.times RGB LED
+- 1#sym.times Single LED (for PWM Telemetry Output)
+- 1#sym.times Potentiometer ($10 "k"Omega$)
+- 4#sym.times $220 Omega$ Current-Limiting Resistors
+- Breadboard & Jumper Wires
 
-Please use #emphasis[Tinkercad Circuits] or #emphasis[Arduino IDE] to assemble the circuit and write the C++ firmware.
+Please use #emphasis[Arduino IDE] or #emphasis[Tinkercad Circuits]/#emphasis[Hardware] to build the circuits and write your C++ firmware.
 
 What follows are the set of required features and their descriptions.
 
-== Part 1: Arduino-to-Arduino UART Serial Bridge
+== Part 1: Serial Command Parser (Master-to-Slave via SoftwareSerial)
 
 Set up an asynchronous serial link between *Arduino 1 (Master)* and *Arduino 2 (Slave)*:
 - Connect Master `TX` (Pin 1) $arrow.r$ Slave `RX` (Pin 0).
 - Connect Master `RX` (Pin 0) $arrow.r$ Slave `TX` (Pin 1).
 - Connect Master `GND` $arrow.r$ Slave `GND` (Shared Common Ground).
 
-Configure both hardware UART interfaces at a *Baud Rate of 9600 bps*. 
+The system behavior must satisfy the following logic:
+1. *Arduino 1* receives a single character command (`'R'`, `'G'`, or `'B'`) from the PC Serial Monitor (`Serial`) and forwards it to Arduino 2 via Serial Communication (`TX`/`RX`).
+2. *Arduino 2* receives the character over Serial (`RX`) and toggles the corresponding LED indicator:
+   - `'R'` $arrow.r$ Turns ON the *Red LED* (and turns OFF others).
+   - `'G'` $arrow.r$ Turns ON the *Green LED* (and turns OFF others).
+   - `'B'` $arrow.r$ Turns ON the *Blue LED* (and turns OFF others).
 
-Write firmware for *Arduino 1 (Master)* to read incoming text data from the computer's Serial Monitor and forward it immediately across the hardware serial line to *Arduino 2 (Slave)*.
+#block(
+  fill: rgb("fff8e6"),
+  stroke: (left: 4pt + rgb("f59e0b")),
+  inset: 10pt,
+  radius: (right: 4pt),
+  [
+    #text(weight: "bold", fill: rgb("b45309"))[★ Bonus Challenge :] \
+    Implement the inter-board communication using the `SoftwareSerial` library on custom digital pins instead of the primary hardware serial pins (`TX`/`RX`), allowing the primary `Serial` interface to remain dedicated to debugging.
+  ]
+)
 
-#important[Always ensure a common GND connection between both Arduino boards. Without a shared 0V reference, signal levels will be misread, causing data corruption.]
+#important[Always ensure both Arduino boards share a common `GND` connection to unify signal reference voltage.]
 
-#tip[Avoid using `delay()` inside serial reading loops to prevent hardware buffer overruns.]
+== Part 2: I2C Master-Slave Sensor & Actuator Interface
 
-== Part 2: I2C LCD Display Rendering on Slave Node
+Establish an I2C communication bus between the two Arduinos using the `<Wire.h>` library:
+- *Arduino 1 (Master):* Initiates periodic data requests.
+- *Arduino 2 (Slave - Address `0x08`):* Samples local analog telemetry.
 
-Connect the 16x2 I2C LCD Display exclusively to *Arduino 2 (Slave)*:
-- LCD `SDA` $arrow.r$ Slave Analog Pin `A4`
-- LCD `SCL` $arrow.r$ Slave Analog Pin `A5`
-- LCD `VCC` $arrow.r$ Slave `5V`
-- LCD `GND` $arrow.r$ Slave `GND`
+Hardware & Logical Requirements:
+1. Connect a Potentiometer to Analog Pin `A0` on *Arduino 2 (Slave)*.
+2. The Slave must continuously read the potentiometer, scale the 10-bit raw ADC reading ($0-1023$) to an 8-bit PWM value ($0-255$), and register an `onRequest` interrupt service routine using `Wire.onRequest()`.
+3. *Arduino 1 (Master)* periodically requests $1 "byte"$ from address `0x08` using `Wire.requestFrom()`. Upon receiving the telemetry byte, it updates the brightness of an LED connected to its PWM `Pin 3` using `analogWrite()`.
 
-Firmware requirements for *Arduino 2 (Slave)*:
-1. Initialize the I2C LCD screen at address `0x27` (or `0x3F`) using `<Wire.h>` and `<LiquidCrystal_I2C.h>`.
-2. Listen continuously on the UART `RX` pin for incoming messages sent by *Arduino 1 (Master)*.
-3. Parse the incoming string and render the received text live on the I2C LCD screen.
-
-#tip[Use `lcd.clear()` or manage cursor positioning properly before printing new serial frames to prevent overlapping old characters on the display.]
+#tip[In I2C interrupt handlers (`Wire.onRequest`), avoid calling blocking operations such as `delay()` or heavy `Serial.print()` calls.]
 
 = Appendix
 
-== Hardware Interfacing & Pinout Reference
+== Hardware Interfacing & Bus Pins
 
-=== UART Interface Connections
-- *Data Rate:* $9600" bps"$
-- *Logic Voltage:* $5"V"$
-- *Wiring Topology:* Cross-connected (`TX` to `RX`, `RX` to `TX`)
+=== SoftwareSerial Interfacing (Part 1)
+- *Arduino 1 (Master):* `Pin 10` (RX), `Pin 11` (TX)
+- *Arduino 2 (Slave):* `Pin 10` (RX), `Pin 11` (TX)
+- *Wiring Topology:* Cross-connected (`Pin 10` $arrow.r$ `Pin 11`, `Pin 11` $arrow.r$ `Pin 10`).
 
-=== I2C Display Connections
-- *Address:* `0x27` or `0x3F`
-- *Signal Lines:* `SDA` (Pin A4), `SCL` (Pin A5)
+=== I2C Hardware Bus Interfacing (Part 2)
+- *Master & Slave Pins:* `SDA` (Analog Pin `A4`), `SCL` (Analog Pin `A5`).
+- *Bus Speed:* Standard Mode ($100 "kHz"$).
 
-== Arduino Uno Hardware Details
+== Board Compatibility & Hardware Pinouts
 
-=== Power & Logic Properties
-- Logic Level: $5"V"$
-- Output Voltages: $3.3"V"$, $5"V"$
-- Common Ground: Shared `GND` pin connection required across both boards.
+All Arduino boards are supported in the Arduino IDE natively without extra package installation.
 
-=== Pinout Diagram
+=== Arduino Uno
+- *Connection:* USB-B
+- *Power Properties:* Power over USB (YES), Output Voltages ($3.3"V"$, $5"V"$)
+
 #align(center)[
   #figure(caption: "Arduino Uno REV3 Pinout Diagram")[
-   #image("/Phase 1/Electrical/session 3/assets/uno-pinout.svg", width: 70%)
+    #image("/Phase 1/Electrical/session 3/assets/uno-pinout.svg", width: 70%)
   ]
 ]
+
+=== Arduino Nano
+- *Connection:* Mini-USB or USB-C (depending on model)
+- *Power Properties:* Power over USB (YES), Output Voltages ($3.3"V"$, $5"V"$)
+
+#align(center)[
+  #figure(caption: "Arduino Nano Pinout Diagram")[
+    #image("/Phase 1/Electrical/session 3/assets/nano-pinout.pdf", width: 60%)
+  ]
+]
+
+=== Arduino Mega
+- *Connection:* USB-B
+- *Power Properties:* Power over USB (YES), Output Voltages ($3.3"V"$, $5"V"$)
+
+#align(center)[
+  #figure(caption: "Arduino Mega 2560 REV3 Pinout Diagram")[
+    #image("/Phase 1/Electrical/session 3/assets/mega-pinout.pdf", width: 60%)
+  ]
+]
+
+=== ESP32 Boards
+ESP32 boards will likely NOT be used as they require installing additional board packages in Arduino IDE and USB-to-Serial drivers. You may safely ignore this section unless instructed otherwise by your mentor.
+
+If given an ESP32 board, common targets include:
+- `ESP-WROOM-32 (38-Pin / 30-Pin)`
+- `ESP32-S3-N16R8`
+
+Common USB-to-Serial drivers:
+- FTDI Drivers (`FT232` series): #link("https://ftdichip.com/drivers/vcp-drivers/", "FTDI Downloads")
+- Silicon Labs Drivers (`CP210x` series): #link("https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads", "CP210x Downloads")
