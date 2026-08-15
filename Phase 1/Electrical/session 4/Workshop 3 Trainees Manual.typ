@@ -2,17 +2,17 @@
   brand-palette, cover-page, emphasis, pause-page-counting, report-template, resume-page-counting, watermark_text,
 )
 
-#import "@preview/calloutly:1.1.0": important, tip
-#import "/Theme/common.typ": setup-codly
+#import "@preview/calloutly:1.1.0": important, tip, caution
+#import "/Theme/common.typ": setup-codly, link-ref
 
 #show: setup-codly
 
 #cover-page(
   title: [Training '26],
   subtitle: [Electrical | Phase I],
-  topic: [Workshop 4: Communication Protocols\ TRAINEE'S GUIDE],
+  topic: [Workshop 3: Communication Protocols\ TRAINEE'S MANUAL],
 )
-#show: report-template.with(ribbon-text: "Workshop 4 | GUIDE")
+#show: report-template.with(ribbon-text: "Workshop 3")
 
 = Introduction
 
@@ -54,16 +54,11 @@ The system behavior must satisfy the following logic:
    - `'G'` $arrow.r$ Turns ON the *Green LED* (and turns OFF others).
    - `'B'` $arrow.r$ Turns ON the *Blue LED* (and turns OFF others).
 
-#block(
-  fill: rgb("fff8e6"),
-  stroke: (left: 4pt + rgb("f59e0b")),
-  inset: 10pt,
-  radius: (right: 4pt),
-  [
-    #text(weight: "bold", fill: rgb("b45309"))[★ Bonus Challenge :] \
-    Implement the inter-board communication using the `SoftwareSerial` library on custom digital pins instead of the primary hardware serial pins (`TX`/`RX`), allowing the primary `Serial` interface to remain dedicated to debugging.
-  ]
-)
+#caution(
+  title: [Bonus Challenge],
+  icon: [#sym.star],
+)[Implement the inter-board communication using the `SoftwareSerial` library on custom digital pins instead of the primary hardware serial pins (`TX`/`RX`), allowing the primary `Serial` interface to remain dedicated to debugging.
+]
 
 #important[Always ensure both Arduino boards share a common `GND` connection to unify signal reference voltage.]
 
@@ -90,10 +85,10 @@ Hardware & Logical Requirements:
 - *Wiring Topology:* Cross-connected (`Pin 10` $arrow.r$ `Pin 11`, `Pin 11` $arrow.r$ `Pin 10`).
 
 === I2C Hardware Bus Interfacing (Part 2)
-- *Master & Slave Pins:* `SDA` (Analog Pin `A4`), `SCL` (Analog Pin `A5`).
+- *Master & Slave Pins:* `SDA` (Analog Pin `A4`), `SCL` (Analog Pin `A5`) -- this applies to the Arduino Nano and Uno REV3, not the Arduino Mega. Boards may have other dedicated `SDA` and `SCL` pins.
 - *Bus Speed:* Standard Mode ($100 "kHz"$).
 
-== Board Compatibility & Hardware Pinouts
+== Board Compatibility & Hardware Pinouts <pinouts-section>
 
 All Arduino boards are supported in the Arduino IDE natively without extra package installation.
 
@@ -134,6 +129,8 @@ If given an ESP32 board, common targets include:
 - `ESP-WROOM-32 (38-Pin / 30-Pin)`
 - `ESP32-S3-N16R8`
 
-Common USB-to-Serial drivers:
-- FTDI Drivers (`FT232` series): #link("https://ftdichip.com/drivers/vcp-drivers/", "FTDI Downloads")
-- Silicon Labs Drivers (`CP210x` series): #link("https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads", "CP210x Downloads")
+== Common USB-to-Serial drivers:
+
+- FTDI Drivers (FT232 series): #link("https://ftdichip.com/drivers/vcp-drivers/", "FTDI Downloads")
+- Silicon Labs Drivers (CP210x series): #link("https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads", "CP210x Downloads")
+- WCH Drivers `CH340X`/`CH341X`: #link("https://www.wch-ic.com/downloads/CH341SER_ZIP.html", "CH341SER Downloads")

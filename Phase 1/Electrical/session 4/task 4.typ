@@ -34,7 +34,7 @@ Please use #emphasis[SimulIDE] or #emphasis[Tinkercad Circuits] to simulate and 
 
 == Multi-Slave Distributed Control & Telemetry System
 
-You are tasked with designing and implementing a multi-node distributed embedded system over an I2C communication bus. The network consists of **1 Master Controller** and **3 Dedicated Slave Nodes**, each performing isolated sensing, actuation, or telemetry processing tasks.
+You are tasked with designing and implementing a multi-node distributed embedded system over an I2C communication bus. The network consists of *1 Master Controller* and *3 Dedicated Slave Nodes*, each performing isolated sensing, actuation, or telemetry processing tasks.
 
 === Bus Topology & System Architecture
 
@@ -60,7 +60,7 @@ Receive a 2-byte telemetry packet `[PWM_Value, Active_LED_Count]` from the Maste
 
 === Subtask D: Master Routing & Arbitration Logic
 
-The **Master Controller** must manage the bus flow periodically every $100 "ms"$ without using heavy blocking code:
+The *Master Controller* must manage the bus flow periodically every $100 "ms"$ without using heavy blocking code:
 
 1. Request the PWM byte from *Slave 1 (`0x0A`)*.
 2. Send the PWM byte to *Slave 3 (`0x0C`)*.
@@ -69,23 +69,7 @@ The **Master Controller** must manage the bus flow periodically every $100 "ms"$
 
 #tip[Keep all I2C interrupt service routines (`Wire.onRequest` and `Wire.onReceive`) extremely short. Never use `Serial.print()` or `delay()` inside an ISR!]
 
-== Bonus Task: SPI 7-Segment Display Driver (SPI Protocol Integration)
 
-#important(title: "Note")[
-  The `Active LEDs Count` is excluded from the I2C LCD Node and must be displayed on the SPI 7-Segment Display instead.
-]
-
-To incorporate hardware synchronous SPI communication into Tinkercad:
-
-1. **Hardware Interfacing (SPI Bus on Master):**
-  - Connect a **74HC595 Shift Register IC** to the Master Arduino's SPI hardware pins to drive a **7-Segment Display**:
-    - `MOSI` (Data / SER) $arrow$ Pin 11
-    - `SCK` (Clock / SRCLK) $arrow$ Pin 13
-    - `CS` (Latch / RCLK / SS) $arrow$ Pin 10
-2. **Firmware SPI Display Logic:**
-  - Initialize the SPI peripheral on the Master using the standard `<SPI.h>` library (`SPI.begin()`).
-  - On every $100 "ms"$ cycle, after receiving the active LED count ($0-5$) from Slave 3, transmit the segment data byte across the SPI bus using `SPI.transfer()`.
-  - Toggle Chip Select (`CS`) LOW before transfer and HIGH after transfer to latch the packet to the 7-Segment Display.
 = Submission
 
 #important(
@@ -97,14 +81,14 @@ To incorporate hardware synchronous SPI communication into Tinkercad:
 ]
 
 - You are required to submit via the Google Form: https://forms.gle/RLUQqzxZtdAVvPoY8
-- Deadline: Monday, August 14th -- 11:59 pm
+- Deadline: Friday, August 14th -- 11:59 pm
 
 = Appendix
 
 == Hardware Interfacing & Bus Pins
 
 === I2C Hardware Bus Wiring Topology
-- *Master & Slaves Standard Pins:* `SDA` (Analog Pin `A4`), `SCL` (Analog Pin `A5`).
+- *Master & Slave Pins:* `SDA` (Analog Pin `A4`), `SCL` (Analog Pin `A5`) -- this applies to the Arduino Nano and Uno REV3, not the Arduino Mega. Boards may have other dedicated `SDA` and `SCL` pins.
 - *Pull-Up Requirement:* $4.7 "k"Omega$ resistors tied from `SDA` and `SCL` to $5"V"$.
 - *Bus Speed:* Standard Mode ($100 "kHz"$).
 
@@ -138,17 +122,16 @@ All Arduino boards are supported in Arduino IDE natively without extra package i
 
 #align(center)[
   #figure(caption: "Arduino Mega 2560 REV3 Pinout Diagram")[
-    #image("/Phase 1/Electrical/session 3/assets/mega-pinout.pdf", width: 60%)
+    #image("/Phase 1/Electrical/session 3/assets/mega-pinout.pdf", width: 58%)
   ]
 ]
 
-=== ESP32 Boards
-ESP32 boards will likely NOT be used as they require installing additional board packages in Arduino IDE and USB-to-Serial drivers. You may safely ignore this section unless instructed otherwise by your mentor.
+== ESP32 Boards
+Arduino IDE setup guide for ESP32 boards:\
+https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html
 
-If given an ESP32 board, common targets include:
-- `ESP-WROOM-32 (38-Pin / 30-Pin)`
-- `ESP32-S3-N16R8`
+== Common USB-to-Serial drivers:
 
-Common USB-to-Serial drivers:
-- FTDI Drivers (`FT232` series): #link("https://ftdichip.com/drivers/vcp-drivers/", "FTDI Downloads")
-- Silicon Labs Drivers (`CP210x` series): #link("https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads", "CP210x Downloads")
+- FTDI Drivers (FT232 series): #link("https://ftdichip.com/drivers/vcp-drivers/", "FTDI Downloads")
+- Silicon Labs Drivers (CP210x series): #link("https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads", "CP210x Downloads")
+- WCH Drivers `CH340X`/`CH341X`: #link("https://www.wch-ic.com/downloads/CH341SER_ZIP.html", "CH341SER Downloads")

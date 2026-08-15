@@ -18,3 +18,28 @@
   codly(languages: codly-languages)
   body
 }
+
+#let link-ref(lbl, show-label: true, show-content: true) = context {
+  let matches = query(lbl)
+  
+  if matches.len() > 0 {
+    let el = matches.first()
+    let target-loc = el.location()
+    
+    let resolved-content = if el.has("body") {
+      el.body
+    } else if el.has("caption") {
+      el.caption
+    } else {
+      el
+    }
+
+    if show-label and show-content {
+      link(target-loc, [#ref(lbl): #resolved-content])
+    } else if show-label {
+      ref(lbl)
+    } else {
+      link(target-loc, resolved-content)
+    }
+  }
+}

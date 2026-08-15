@@ -229,6 +229,7 @@
   })
   show heading: reset-counter(counter(heading), levels: 1)
   show link: set text(fill: brand-palette.primary)
+  show ref: set text(fill: brand-palette.primary)
   show outline.entry: set text(fill: brand-palette.primary)
   show outline.entry: it => {
     show link: set text(fill: brand-palette.primary)

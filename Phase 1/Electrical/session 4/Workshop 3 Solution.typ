@@ -2,7 +2,7 @@
   brand-palette, cover-page, emphasis, pause-page-counting, report-template, resume-page-counting, watermark_text,
 )
 
-#import "@preview/calloutly:1.1.0": important, tip
+#import "@preview/calloutly:1.1.0": caution, important, note, tip
 #import "/Theme/common.typ": setup-codly
 
 #show: setup-codly
@@ -10,9 +10,9 @@
 #cover-page(
   title: [Training '26],
   subtitle: [Electrical | Phase I],
-  topic: [Workshop 4: Communication Protocols\ MENTOR'S GUIDE & SOLUTIONS],
+  topic: [Workshop 3: Communication Protocols\ SOLUTION],
 )
-#show: report-template.with(ribbon-text: "Workshop 4 | MENTOR GUIDE")
+#show: report-template.with(ribbon-text: "Workshop 3 | Solution")
 
 = Introduction
 
@@ -54,17 +54,11 @@ The system behavior must satisfy the following logic:
   - `'G'` $arrow.r$ Turns ON the *Green LED* (and turns OFF others).
   - `'B'` $arrow.r$ Turns ON the *Blue LED* (and turns OFF others).
 
-#block(
-  fill: rgb("fff8e6"),
-  stroke: (left: 4pt + rgb("f59e0b")),
-  inset: 10pt,
-  radius: (right: 4pt),
-  [
-    #text(weight: "bold", fill: rgb("b45309"))[★ Bonus Challenge :] \
-    Implement the inter-board communication using the `SoftwareSerial` library on custom digital pins instead of the primary hardware serial pins (`TX`/`RX`), allowing the primary `Serial` interface to remain dedicated to debugging.
-  ],
-)
-
+#caution(
+  title: [Bonus Challenge],
+  icon: [#sym.star],
+)[Implement the inter-board communication using the `SoftwareSerial` library on custom digital pins instead of the primary hardware serial pins (`TX`/`RX`), allowing the primary `Serial` interface to remain dedicated to debugging.
+]
 #important[Always ensure both Arduino boards share a common `GND` connection to unify signal reference voltage.]
 
 == Part 2: I2C Master-Slave Sensor & Actuator Interface
@@ -264,7 +258,7 @@ void sendData() {
 }
 ```
 
-= Mentors' Quick Revision & Recap
+= Quick Revision & Recap
 
 #let ref-list(entries) = {
   for (i, e) in entries.enumerate() {
@@ -326,7 +320,7 @@ void sendData() {
   (fn: "Serial.println()", desc: [Works like `print()`, but appends `\r\n` after the text.]),
 ))
 
-== I2C (Wire.h) Functions Recap
+== I2C (`Wire.h`) Functions Recap
 
 === General Functions
 
@@ -379,17 +373,52 @@ void sendData() {
   ),
 ))
 
-#block(
-  fill: rgb("fff8e6"),
-  stroke: (left: 4pt + rgb("f59e0b")),
-  inset: 10pt,
-  radius: (right: 4pt),
-  [
-    In I2C, whether acting as master or slave, you cannot read more than one byte at a time. To receive multi-byte values, read the data into a `char` array first, then convert it -- using `atoi()` for integers or `atof()` for floats.
-  ],
-)
+#caution(title: [Bonus Challenge], icon: [#sym.star])[
+  In I2C, whether acting as master or slave, you cannot read more than one byte at a time. To receive multi-byte values, read the data into a `char` array first, then convert it -- using `atoi()` for integers or `atof()` for floats.
+]
 
 = Appendix
+
+== Extra Resources
+
+The following are extra resources on communication protocols and on LCD.
+
+=== UART
+- https://www.engineersgarage.com/articles-arduino-serial-communication-uart/
+- https://www.electronicwings.com/arduino/usart-in-arduino-uno
+- https://www.arduino.cc/reference/en/language/functions/communication/serial/
+- https://www.circuitbasics.com/basics-uart-communication/
+- https://www.geeksforgeeks.org/universal-asynchronous-receiver-transmitter-uart-protocol/
+- SoftwareSerial: https://linuxhint.com/software-serial-library-arduino/
+
+=== SPI
+- https://www.circuitbasics.com/basics-of-the-spi-communication-protocol/
+- SPI Arduino library: https://www.arduino.cc/reference/en/language/functions/communication/spi/
+
+=== I2C
+- https://www.geeksforgeeks.org/i2c-communication-protocol/
+- https://www.youtube.com/watch?v=PnG4fO5_vU4
+- https://www.electronicwings.com/arduino/arduino-i2c
+- https://www.electronicshub.org/arduino-i2c-tutorial/
+- https://www.arduino.cc/reference/en/language/functions/communication/wire/
+- https://docs.arduino.cc/learn/communication/wire
+
+=== Differential Pair
+- https://www.ti.com/document-viewer/lit/html/SSZTCR1
+
+=== CAN
+- https://www.typhoon-hil.com/documentation/typhoon-hil-software-manual/References/can_bus_protocol.html#:~:text=The%20Controller%20Area%20Network%20protocol,and%20interact%20in%20a%20network
+- CAN bus: https://www.emqx.com/en/blog/can-bus-how-it-works-pros-and-cons
+
+
+=== USB
+- https://www.elprocus.com/usb-protocol/
+- https://developerhelp.microchip.com/xwiki/bin/view/applications/usb/how-it-works/
+
+=== LCD
+- https://github.com/RobTillaart/I2C_LCD
+- https://lastminuteengineers.com/i2c-lcd-arduino-tutorial/
+- https://youtu.be/CvqHkXeXN3M?si=3OyWE4ddmm2zlw-l
 
 == Hardware Interfacing & Bus Pins
 
@@ -456,7 +485,8 @@ If given an ESP32 board, common targets include:
 - ESP-WROOM-32 (38-Pin / 30-Pin)
 - ESP32-S3-N16R8
 
-Common USB-to-Serial drivers:
+== Common USB-to-Serial drivers:
 
 - FTDI Drivers (FT232 series): #link("https://ftdichip.com/drivers/vcp-drivers/", "FTDI Downloads")
 - Silicon Labs Drivers (CP210x series): #link("https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads", "CP210x Downloads")
+- WCH Drivers `CH340X`/`CH341X`: #link("https://www.wch-ic.com/downloads/CH341SER_ZIP.html", "CH341SER Downloads")

@@ -207,20 +207,11 @@ USB-B
 
 
 == ESP32 Boards
-ESP32 boards will likely NOT be used as they require installing additional boards on Arduino IDE and installing serial USB IC drivers. You may safely ignore this section.
-
-If given an ESP32 board, follow your mentor's instructions for getting it working.
-
-You may expect to receive one of the following:
-- `ESP-WROOM-32 38-Pin`
-- `ESP-WROOM-32 30-Pin`
-- `ESP32-S3-N16R8`
-
-Common serial-over-USB ICs and their drivers are:
-- FTDI chips, ex: `iFT232-S16`. #link("https://ftdichip.com/drivers/vcp-drivers/", "Drivers").
-- CP210x chips, ex: `CP2102`. #link("https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads", "Drivers").
-
-Boards either use micro-USB or USB-C for connection.
-
 Arduino IDE setup guide for ESP32 boards:\
 https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html
+
+== Common USB-to-Serial drivers:
+
+- FTDI Drivers (FT232 series): #link("https://ftdichip.com/drivers/vcp-drivers/", "FTDI Downloads")
+- Silicon Labs Drivers (CP210x series): #link("https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads", "CP210x Downloads")
+- WCH Drivers `CH340X`/`CH341X`: #link("https://www.wch-ic.com/downloads/CH341SER_ZIP.html", "CH341SER Downloads")
