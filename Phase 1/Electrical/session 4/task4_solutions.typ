@@ -34,7 +34,7 @@ Please use #emphasis[SimulIDE] or #emphasis[Tinkercad Circuits] to simulate and 
 
 == Multi-Slave Distributed Control & Telemetry System
 
-You are tasked with designing and implementing a multi-node distributed embedded system over an I2C communication bus. The network consists of *1 Master Controller* and *3 Dedicated Slave Nodes*, each performing isolated sensing, actuation, or telemetry processing tasks.
+You are tasked with designing and implementing a multi-node distributed embedded system over an I2C communication bus. The network consists of **1 Master Controller** and **3 Dedicated Slave Nodes**, each performing isolated sensing, actuation, or telemetry processing tasks.
 
 === Bus Topology & System Architecture
 
@@ -60,7 +60,7 @@ Receive a 2-byte telemetry packet `[PWM_Value, Active_LED_Count]` from the Maste
 
 === Subtask D: Master Routing & Arbitration Logic
 
-The *Master Controller* must manage the bus flow periodically every $100 "ms"$ without using heavy blocking code:
+The **Master Controller** must manage the bus flow periodically every $100 "ms"$ without using heavy blocking code:
 
 1. Request the PWM byte from *Slave 1 (`0x0A`)*.
 2. Send the PWM byte to *Slave 3 (`0x0C`)*.
@@ -69,7 +69,159 @@ The *Master Controller* must manage the bus flow periodically every $100 "ms"$ w
 
 #tip[Keep all I2C interrupt service routines (`Wire.onRequest` and `Wire.onReceive`) extremely short. Never use `Serial.print()` or `delay()` inside an ISR!]
 
+= Solution
 
+== Master Controller (Arduino 1)
+
+Polls Slave 1 for the potentiometer reading, forwards it to Slave 3, requests back the active LED count, and routes both values to Slave 2 for display — all on a $100 "ms"$ cycle.
+
+```cpp
+#include <Wire.h>
+const byte slave1_addr = 0x0A;
+const byte slave2_addr = 0x0B;
+const byte slave3_addr = 0x0C;
+uint8_t pot_reading = 0;
+uint8_t led_count = 0;
+void setup()
+{
+  Serial.begin(9600);
+  Wire.begin();
+}
+void loop()
+{
+  Wire.requestFrom(slave1_addr, (uint8_t)1);
+  if (Wire.available()) {
+    pot_reading = Wire.read();
+  }
+  Wire.beginTransmission(slave3_addr);
+  Wire.write(pot_reading);
+  Wire.endTransmission();
+  Wire.requestFrom(slave3_addr, (uint8_t)1);
+  if (Wire.available()) {
+    led_count = Wire.read();
+  }
+  Wire.beginTransmission(slave2_addr);
+  Wire.write(pot_reading);
+  Wire.write(led_count);
+  Wire.endTransmission();
+  delay(100);
+}
+```
+
+== Slave 1 — Sensor Node (Address `0x0A`)
+
+Reads the potentiometer on `A0`, scales the 10-bit ADC value down to an 8-bit PWM value, and hands it off to the Master via `onRequest`.
+
+```cpp
+// C++ code
+//
+#define pot_pin A0
+#include <Wire.h>
+byte slave_addr1 = 0x0A;
+uint8_t pot_reading;
+void send_data(){
+	Wire.write(pot_reading);
+}
+void setup()
+{
+  pinMode(pot_pin, INPUT);
+  Wire.begin(slave_addr1);
+  Wire.onRequest(send_data);
+}
+void loop()
+{
+	pot_reading = map(analogRead(pot_pin),0,1023,0,255);
+  delay(50);
+}
+```
+
+== Slave 2 — Telemetry Display Node (Address `0x0B`)
+
+Receives the `[PWM_Value, Active_LED_Count]` packet from the Master via `onReceive` and renders both values on the 16x2 LCD.
+
+```cpp
+// C++ code
+//
+//LCD RS pin to digital pin 12
+//LCD Enable pin to digital pin 11
+//LCD D4 pin to digital pin 5
+//LCD D5 pin to digital pin 4
+//LCD D6 pin to digital pin 3
+//LCD D7 pin to digital pin 2
+//LCD R/W pin to GND
+//LCD VSS pin to GND
+//LCD VCC pin to 5V
+//LCD LED+ to 5V through a 220 ohm resistor
+//LCD LED- to GND
+#include "Wire.h"
+#include "LiquidCrystal.h"
+byte slave2_addr = 0x0B;
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+volatile uint8_t pwm;
+volatile uint8_t led_count;
+volatile bool data_received;
+void received_data(int num_bytes){
+  while(Wire.available()){
+  	pwm = (int)Wire.read();
+    led_count = (int)Wire.read();
+    data_received=true;
+  }
+}
+void setup()
+{
+  Wire.begin(slave2_addr);
+  Wire.onReceive(received_data);
+  lcd.begin(16, 2);
+}
+void loop()
+{
+  if(data_received){
+    lcd.setCursor(0,0);
+    lcd.print(pwm);
+    lcd.setCursor(0,1);
+    lcd.print(led_count);
+    data_received = false;
+  }
+}
+```
+
+== Slave 3 — Actuator Node (Address `0x0C`)
+
+Receives the target PWM byte from the Master via `onReceive`, drives the 5-LED bargraph accordingly, and reports the active LED count back via `onRequest`.
+
+```cpp
+int leds_pins[5] = { 8, 9, 10, 11, 12};
+byte slave_addr3 = 0x0c;
+#include "Wire.h"
+volatile uint8_t received_byte;
+volatile uint8_t num_of_leds;
+
+void receive_data(int){
+  while(Wire.available()){
+    received_byte = Wire.read();
+  }
+}
+void send_data(){
+  Wire.write(num_of_leds);
+}
+void setup(){
+  for(int i = 0 ; i < 5 ; i++){
+  	pinMode(leds_pins[i],OUTPUT);
+  }
+  Wire.begin(slave_addr3);
+  Wire.onReceive(receive_data);
+  Wire.onRequest(send_data);
+}
+void loop(){
+	num_of_leds = map(received_byte,0,255,0,5);
+	for(int i = 0 ; i < num_of_leds ; i++)
+      digitalWrite(leds_pins[i],HIGH);
+
+  	for(int i = num_of_leds  ; i < 5 ; i++)
+      digitalWrite(leds_pins[i],LOW);
+}
+```
 
 = Submission
 
@@ -82,14 +234,14 @@ The *Master Controller* must manage the bus flow periodically every $100 "ms"$ w
 ]
 
 - You are required to submit via the Google Form: https://forms.gle/RLUQqzxZtdAVvPoY8
-- Deadline: Friday, August 14th -- 11:59 pm
+- Deadline: Monday, August 14th -- 11:59 pm
 
 = Appendix
 
 == Hardware Interfacing & Bus Pins
 
 === I2C Hardware Bus Wiring Topology
-- *Master & Slave Pins:* `SDA` (Analog Pin `A4`), `SCL` (Analog Pin `A5`) -- this applies to the Arduino Nano and Uno REV3, not the Arduino Mega. Boards may have other dedicated `SDA` and `SCL` pins.
+- *Master & Slaves Standard Pins:* `SDA` (Analog Pin `A4`), `SCL` (Analog Pin `A5`).
 - *Pull-Up Requirement:* $4.7 "k"Omega$ resistors tied from `SDA` and `SCL` to $5"V"$.
 - *Bus Speed:* Standard Mode ($100 "kHz"$).
 
@@ -123,16 +275,17 @@ All Arduino boards are supported in Arduino IDE natively without extra package i
 
 #align(center)[
   #figure(caption: "Arduino Mega 2560 REV3 Pinout Diagram")[
-    #image("/Phase 1/Electrical/session 3/assets/mega-pinout.pdf", width: 58%)
+    #image("/Phase 1/Electrical/session 3/assets/mega-pinout.pdf", width: 60%)
   ]
 ]
 
-== ESP32 Boards
-Arduino IDE setup guide for ESP32 boards:\
-https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html
+=== ESP32 Boards
+ESP32 boards will likely NOT be used as they require installing additional board packages in Arduino IDE and USB-to-Serial drivers. You may safely ignore this section unless instructed otherwise by your mentor.
 
-== Common USB-to-Serial drivers:
+If given an ESP32 board, common targets include:
+- `ESP-WROOM-32 (38-Pin / 30-Pin)`
+- `ESP32-S3-N16R8`
 
-- FTDI Drivers (FT232 series): #link("https://ftdichip.com/drivers/vcp-drivers/", "FTDI Downloads")
-- Silicon Labs Drivers (CP210x series): #link("https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads", "CP210x Downloads")
-- WCH Drivers `CH340X`/`CH341X`: #link("https://www.wch-ic.com/downloads/CH341SER_ZIP.html", "CH341SER Downloads")
+Common USB-to-Serial drivers:
+- FTDI Drivers (`FT232` series): #link("https://ftdichip.com/drivers/vcp-drivers/", "FTDI Downloads")
+- Silicon Labs Drivers (`CP210x` series): #link("https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads", "CP210x Downloads")
