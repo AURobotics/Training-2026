@@ -34,9 +34,15 @@
       el
     }
 
-    if show-label and show-content {
+    let is-numbered = if el.has("numbering") {
+      el.numbering != none
+    } else {
+      false
+    }
+
+    if show-label and is-numbered and show-content {
       link(target-loc, [#ref(lbl): #resolved-content])
-    } else if show-label {
+    } else if show-label and is-numbered  {
       ref(lbl)
     } else {
       link(target-loc, resolved-content)

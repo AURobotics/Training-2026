@@ -10,7 +10,7 @@
 #cover-page(
   title: [Training '26],
   subtitle: [Electrical | Phase I],
-  topic: [Task 5:Sensors & Motors],
+  topic: [Task 5: Sensors & Motors],
 )
 #show: report-template.with(ribbon-text: "Task 5")
 
