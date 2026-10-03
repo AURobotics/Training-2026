@@ -1,6 +1,6 @@
 #import "@preview/calloutly:1.1.0": callout-style
 #import "@preview/nth:1.0.1": *
-#import "/Theme/common.typ": brand-palette
+#import "/Theme/common.typ": *
 #import "@preview/headcount:0.1.1": dependent-numbering, reset-counter
 
 #let show-page-number = state("show-page-number", true)
@@ -21,32 +21,6 @@
   }
 }
 
-#let watermark_text(content: "WATERMARK", size: 50pt, alignment: center + horizon, rotation: 45deg, gaps: 0pt, opacity: 40%) = {
-  let val = calc.min(int(float(opacity) * 255), 255)
-  let opacity = str(val, base: 16)
-  if opacity.len() == 1 { opacity = "0" + opacity }
-  return pdf.artifact(kind: "watermark")[
-    #align(alignment)[
-      #rotate(rotation)[
-        #text(
-          fill: tiling(
-            size: (gaps + 1pt, gaps + 1pt),
-            relative: "parent",
-            align(alignment)[
-              #circle(radius: 1pt, fill: rgb("000000" + opacity))
-            ],
-          ),
-          size: size,
-          weight: "bold",
-        )[#content]
-      ]
-    ]
-  ]
-}
-
-#let emphasis(content) = {
-  text(content, fill: brand-palette.background, weight: "bold")
-}
 
 /// A branded report template with a header ribbon.
 /// - ribbon-text (str|content): The text or block to display in the header ribbon.

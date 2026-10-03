@@ -24,7 +24,7 @@ Please note that attending workshops is required unless a valid excuse is provid
   
   [Tuesday, July 28],
   [Workshop 1],
-  table.cell(rowspan: 2, rotate(-90deg, reflow: true)[Task 1]),
+  table.cell(rowspan: 2, table.cell(rotate(-90deg, reflow: true))[Task 1]),
   table.cell(fill: brand-palette.light_gray)[],
   
   [Thursday, July 30], [Session 2: C programming], table.cell(rowspan: 2, rotate(-90deg, reflow: true)[Task 2]),
