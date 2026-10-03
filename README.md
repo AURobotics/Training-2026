@@ -21,3 +21,6 @@ https://repology.org/project/typst/versions
 > Install Nasalization font
 
 https://www.dafont.com/nasalization.font
+
+> Install Jetbrains Mono
+https://www.jetbrains.com/lp/mono/ 
